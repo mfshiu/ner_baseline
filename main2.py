@@ -321,10 +321,12 @@ data_list2, traindata_list2, testdata_list2, traindata_article_id_list2, testdat
 traindata_list2.extend(testdata_list2)
 traindata_article_id_list2.extend(testdata_article_id_list2)
 
+testdata_list = traindata_list2
+testdata_article_id_list = traindata_article_id_list2
+
 # Load Word Embedding
 trainembed_list = Word2Vector(traindata_list, word_vecs)
-# testembed_list = Word2Vector(testdata_list, word_vecs)
-testembed_list = Word2Vector(traindata_list2, word_vecs)
+testembed_list = Word2Vector(testdata_list, word_vecs)
 
 # CRF - Train Data (Augmentation Data)
 print("CRF - Train Data (Augmentation Data)")
