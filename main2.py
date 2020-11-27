@@ -158,9 +158,13 @@ def CRFFormatData(trainingset, position, path):
     outputfile.close()
 
 trainingset, position, mentions = loadInputFile(file_path)
-
 data_path='data/sample.data'
 CRFFormatData(trainingset, position, data_path)
+
+trainingset2, position2, mentions2 = loadInputFile("data/development_2.txt")
+data_path2='data/development.data'
+CRFFormatData(trainingset2, position2, data_path2)
+
 
 def CRF(x_train, y_train, x_test, y_test):
     crf = sklearn_crfsuite.CRF(
@@ -242,10 +246,8 @@ def Dataset(data_path):
     # but you should take `development data` or `test data` as testing data
     # At that time, you could just delete this line,
     # and generate data_list of `train data` and data_list of `development/test data` by this function
-    traindata_list, testdata_list, traindata_article_id_list, testdata_article_id_list = train_test_split(data_list,
-                                                                                                          article_id_list,
-                                                                                                          test_size=0.33,
-                                                                                                          random_state=42)
+    traindata_list, testdata_list, traindata_article_id_list, testdata_article_id_list = \
+        train_test_split(data_list, article_id_list, test_size=0.01, random_state=42)
 
     return data_list, traindata_list, testdata_list, traindata_article_id_list, testdata_article_id_list
 
@@ -312,10 +314,17 @@ def Preprocess(data_list):
 # Training
 
 data_list, traindata_list, testdata_list, traindata_article_id_list, testdata_article_id_list = Dataset(data_path)
+traindata_list.extend(testdata_list)
+traindata_article_id_list.extend(testdata_article_id_list)
+
+data_list2, traindata_list2, testdata_list2, traindata_article_id_list2, testdata_article_id_list2 = Dataset(data_path2)
+traindata_list2.extend(testdata_list2)
+traindata_article_id_list2.extend(testdata_article_id_list2)
 
 # Load Word Embedding
 trainembed_list = Word2Vector(traindata_list, word_vecs)
-testembed_list = Word2Vector(testdata_list, word_vecs)
+# testembed_list = Word2Vector(testdata_list, word_vecs)
+testembed_list = Word2Vector(traindata_list2, word_vecs)
 
 # CRF - Train Data (Augmentation Data)
 print("CRF - Train Data (Augmentation Data)")
