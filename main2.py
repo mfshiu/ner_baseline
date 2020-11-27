@@ -247,7 +247,7 @@ def Dataset(data_path):
     # At that time, you could just delete this line,
     # and generate data_list of `train data` and data_list of `development/test data` by this function
     traindata_list, testdata_list, traindata_article_id_list, testdata_article_id_list = \
-        train_test_split(data_list, article_id_list, test_size=0.01, random_state=42)
+        train_test_split(data_list, article_id_list, test_size=0.33, random_state=42)
 
     return data_list, traindata_list, testdata_list, traindata_article_id_list, testdata_article_id_list
 
@@ -314,19 +314,18 @@ def Preprocess(data_list):
 # Training
 
 data_list, traindata_list, testdata_list, traindata_article_id_list, testdata_article_id_list = Dataset(data_path)
-traindata_list.extend(testdata_list)
-traindata_article_id_list.extend(testdata_article_id_list)
 
-data_list2, traindata_list2, testdata_list2, traindata_article_id_list2, testdata_article_id_list2 = Dataset(data_path2)
-traindata_list2.extend(testdata_list2)
-traindata_article_id_list2.extend(testdata_article_id_list2)
+data_list2, devdata_list, testdata_list2, devdata_article_id_list, testdata_article_id_list2 = Dataset(data_path2)
+devdata_list.extend(testdata_list2)
+devdata_article_id_list.extend(testdata_article_id_list2)
 
-testdata_list = traindata_list2
-testdata_article_id_list = traindata_article_id_list2
+# testdata_list = traindata_list2
+# testdata_article_id_list = traindata_article_id_list2
 
 # Load Word Embedding
 trainembed_list = Word2Vector(traindata_list, word_vecs)
 testembed_list = Word2Vector(testdata_list, word_vecs)
+devembed_list = Word2Vector(devdata_list, word_vecs)
 
 # CRF - Train Data (Augmentation Data)
 print("CRF - Train Data (Augmentation Data)")
@@ -335,8 +334,13 @@ y_train = Preprocess(traindata_list)
 
 # CRF - Test Data (Golden Standard)
 print("CRF - Test Data (Golden Standard)")
-x_test = Feature(testembed_list)
-y_test = Preprocess(testdata_list)
+# x_test = Feature(testembed_list)
+# y_test = Preprocess(testdata_list)
+
+# CRF - Dev Data (Golden Standard)
+print("CRF - Dev Data (Golden Standard)")
+x_test = Feature(devembed_list)
+y_test = Preprocess(devdata_list)
 
 y_pred, y_pred_mar, f1score = CRF(x_train, y_train, x_test, y_test)
 
