@@ -170,12 +170,12 @@ def CRF(x_train, y_train, x_test, y_test):
         max_iterations=100,
         all_possible_transitions=True
     )
+    print("crf.fit...")
     crf.fit(x_train, y_train)
     # print(crf)
     y_pred = crf.predict(x_test)
     y_pred_mar = crf.predict_marginals(x_test)
-
-    # print(y_pred_mar)
+    print(y_pred_mar)
 
     labels = list(crf.classes_)
     labels.remove('O')
@@ -280,6 +280,8 @@ def Word2Vector(data_list, embedding_dict):
 def Feature(embed_list):
     feature_list = list()
     for idx_list in range(len(embed_list)):
+        print("\rFeature: %d/%d"%(idx_list, len(embed_list)-1), end="")
+
         feature_list_tmp = list()
         for idx_tuple in range(len(embed_list[idx_list])):
             feature_dict = dict()
@@ -287,6 +289,8 @@ def Feature(embed_list):
                 feature_dict['dim_' + str(idx_vec+1)] = embed_list[idx_list][idx_tuple][idx_vec]
             feature_list_tmp.append(feature_dict)
         feature_list.append(feature_list_tmp)
+    print()
+
     return feature_list
 
 # get the labels of each tokens in train.data
@@ -294,10 +298,14 @@ def Feature(embed_list):
 def Preprocess(data_list):
     label_list = list()
     for idx_list in range(len(data_list)):
+        print("\rPreprocess: %d/%d"%(idx_list, len(data_list)-1), end="")
+
         label_list_tmp = list()
         for idx_tuple in range(len(data_list[idx_list])):
             label_list_tmp.append(data_list[idx_list][idx_tuple][1])
         label_list.append(label_list_tmp)
+    print()
+
     return label_list
 
 
@@ -310,10 +318,12 @@ trainembed_list = Word2Vector(traindata_list, word_vecs)
 testembed_list = Word2Vector(testdata_list, word_vecs)
 
 # CRF - Train Data (Augmentation Data)
+print("CRF - Train Data (Augmentation Data)")
 x_train = Feature(trainembed_list)
 y_train = Preprocess(traindata_list)
 
 # CRF - Test Data (Golden Standard)
+print("CRF - Test Data (Golden Standard)")
 x_test = Feature(testembed_list)
 y_test = Preprocess(testdata_list)
 
@@ -321,15 +331,22 @@ y_pred, y_pred_mar, f1score = CRF(x_train, y_train, x_test, y_test)
 
 
 # Output data
-
+print("Output data...")
 output = "article_id\tstart_position\tend_position\tentity_text\tentity_type\n"
-for test_id in range(len(y_pred)):
+y_pred_size = len(y_pred)
+for test_id in range(y_pred_size):
+    print("\rtest_id: %d/%d"%(test_id, y_pred_size-1), end="")
+
     pos = 0
     start_pos=None
     end_pos = None
     entity_text = None
     entity_type = None
-    for pred_id in range(len(y_pred[test_id])):
+
+    pred_id_size = len(y_pred[test_id])
+    for pred_id in range(pred_id_size):
+        print("\tpred_id: %d/%d" % (pred_id, pred_id_size - 1))
+
         if y_pred[test_id][pred_id][0]=='B':
             start_pos=pos
             entity_type=y_pred[test_id][pred_id][2:]
@@ -343,6 +360,7 @@ for test_id in range(len(y_pred)):
                  +'\t'+entity_text+'\t'+entity_type
             output+=line+'\n'
         pos += 1
+print()
 
 output_path='output.tsv'
 with open(output_path,'w',encoding='utf-8') as f:
