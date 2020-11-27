@@ -319,8 +319,8 @@ def Preprocess(data_list):
 # Training
 
 data_list, traindata_list, testdata_list, traindata_article_id_list, testdata_article_id_list = Dataset(data_path)
-traindata_list.extend(testdata_list)
-traindata_article_id_list.extend(testdata_article_id_list)
+# traindata_list.extend(testdata_list)
+# traindata_article_id_list.extend(testdata_article_id_list)
 
 data_list2, devdata_list, testdata_list2, devdata_article_id_list, testdata_article_id_list2 = Dataset(data_path2)
 devdata_list.extend(testdata_list2)
