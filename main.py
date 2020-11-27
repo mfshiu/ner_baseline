@@ -8,7 +8,7 @@ from sklearn_crfsuite import scorers
 from sklearn_crfsuite import metrics
 from sklearn_crfsuite.metrics import flat_classification_report
 
-file_path='data/SampleData_deid.txt'
+file_path='data/train_2.txt'
 
 
 def loadInputFile(file_path):
