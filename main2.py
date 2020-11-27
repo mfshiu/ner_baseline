@@ -174,11 +174,16 @@ def CRF(x_train, y_train, x_test, y_test):
         max_iterations=100,
         all_possible_transitions=True
     )
-    print("crf.fit...")
+    print("CRF fitting...")
     crf.fit(x_train, y_train)
-    # print(crf)
+    print("CRF:")
+    print(crf)
+
     y_pred = crf.predict(x_test)
+    print("y_pred:")
+    print(y_pred)
     y_pred_mar = crf.predict_marginals(x_test)
+    print("y_predict_marginals:")
     print(y_pred_mar)
 
     labels = list(crf.classes_)
@@ -314,6 +319,8 @@ def Preprocess(data_list):
 # Training
 
 data_list, traindata_list, testdata_list, traindata_article_id_list, testdata_article_id_list = Dataset(data_path)
+traindata_list.extend(testdata_list)
+traindata_article_id_list.extend(testdata_article_id_list)
 
 data_list2, devdata_list, testdata_list2, devdata_article_id_list, testdata_article_id_list2 = Dataset(data_path2)
 devdata_list.extend(testdata_list2)
@@ -334,13 +341,13 @@ y_train = Preprocess(traindata_list)
 
 # CRF - Test Data (Golden Standard)
 print("CRF - Test Data (Golden Standard)")
-# x_test = Feature(testembed_list)
-# y_test = Preprocess(testdata_list)
+x_test = Feature(testembed_list)
+y_test = Preprocess(testdata_list)
 
 # CRF - Dev Data (Golden Standard)
-print("CRF - Dev Data (Golden Standard)")
-x_test = Feature(devembed_list)
-y_test = Preprocess(devdata_list)
+# print("CRF - Dev Data (Golden Standard)")
+# x_test = Feature(devembed_list)
+# y_test = Preprocess(devdata_list)
 
 y_pred, y_pred_mar, f1score = CRF(x_train, y_train, x_test, y_test)
 
